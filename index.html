@@ -1,0 +1,810 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>测一测，你的隐藏天赋是什么</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2314161A'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%231D3FB3' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%23B9C2D8' stroke-width='1'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%231D3FB3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ink:#0F1115;
+    --ink-2:#33373E;
+    --muted:#6F747D;
+    --paper:#E8E6DC;
+    --card:#FBFBF5;
+    --line:#CFD2DA;
+    --line-soft:#E3E5EB;
+    --accent:#1B37C4;
+    --accent-soft:#DCE1F7;
+    --coral:#E4553A;
+    --gold:#E8B23A;
+    --mono:'IBM Plex Mono','SFMono-Regular',Menlo,monospace;
+    --display:'ZCOOL QingKe HuangYou','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+    --font:'Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;font-family:var(--font);color:var(--ink);overflow-x:hidden;
+    background-color:var(--paper);
+    background-image:
+      radial-gradient(88% 62% at 92% -12%, rgba(27,55,196,.22) 0%, rgba(27,55,196,0) 64%),
+      radial-gradient(70% 55% at -8% 108%, rgba(228,85,58,.20) 0%, rgba(228,85,58,0) 62%),
+      radial-gradient(58% 40% at 46% 46%, rgba(232,178,58,.16) 0%, rgba(232,178,58,0) 72%),
+      linear-gradient(168deg,#EFEEE5 0%,#E4E2D6 100%);
+    background-attachment:fixed;
+    display:flex;justify-content:center;min-height:100vh;
+  }
+  /* 背景网格层 */
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(to right,rgba(15,17,21,.06) 1px,transparent 1px),
+      linear-gradient(to bottom,rgba(15,17,21,.06) 1px,transparent 1px);
+    background-size:26px 26px;
+    -webkit-mask-image:radial-gradient(120% 100% at 50% 0%,#000 0%,rgba(0,0,0,.35) 70%,transparent 100%);
+            mask-image:radial-gradient(120% 100% at 50% 0%,#000 0%,rgba(0,0,0,.35) 70%,transparent 100%);
+  }
+  .app{
+    width:100%;max-width:480px;min-height:100vh;position:relative;z-index:1;
+    padding:28px 22px calc(24px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;overflow:hidden;
+    background:
+      radial-gradient(72% 46% at 100% 0%, rgba(27,55,196,.13) 0%, rgba(27,55,196,0) 68%),
+      radial-gradient(64% 42% at 0% 100%, rgba(228,85,58,.13) 0%, rgba(228,85,58,0) 70%),
+      linear-gradient(180deg,#FCFCF7 0%,#F8F8F2 60%,#F5F5EE 100%);
+    box-shadow:0 0 0 1px rgba(15,17,21,.06);
+  }
+  /* 网点：只在右上角晕开，像印刷品 */
+  .app::before{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(rgba(27,55,196,.30) 1px, transparent 1.5px);
+    background-size:9px 9px;
+    -webkit-mask-image:radial-gradient(58% 42% at 100% 2%,#000 0%,transparent 72%);
+            mask-image:radial-gradient(58% 42% at 100% 2%,#000 0%,transparent 72%);
+    opacity:.55;
+  }
+  /* 纸面颗粒 */
+  .app::after{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.32;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.45'/%3E%3C/svg%3E");
+  }
+  .view{display:none;flex-direction:column;flex:1;min-height:0;position:relative;z-index:1}
+  .view.active{display:flex}
+
+  .mono{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+
+  /* ===== 首页 ===== */
+  .hero-deco{
+    position:absolute;top:-70px;right:-96px;width:320px;height:320px;pointer-events:none;z-index:0;
+    opacity:.85;
+  }
+  .hero-block{
+    position:absolute;left:-90px;bottom:-40px;width:200px;height:200px;pointer-events:none;z-index:0;
+    background:linear-gradient(135deg,rgba(228,85,58,.16),rgba(228,85,58,0));
+    clip-path:polygon(0 0,100% 0,0 100%);
+  }
+  .intro{position:relative;z-index:1;display:flex;flex-direction:column;flex:1}
+  .intro-title{margin:8px 0 0;font-weight:900;line-height:1.18}
+  .intro-title .line-b{
+    display:block;margin-top:12px;
+    font-family:var(--display);font-weight:400;
+    font-size:clamp(27px,8.7vw,38px);
+    line-height:1.34;letter-spacing:2px;color:var(--ink);
+  }
+  .intro-title .hl{
+    position:relative;display:inline-block;color:var(--coral);
+    text-shadow:3px 3px 0 rgba(27,55,196,.22);
+  }
+  .intro-title .hl::after{
+    content:'';position:absolute;left:-3px;right:-3px;bottom:5px;height:34%;
+    background:rgba(232,178,58,.45);transform:skewX(-8deg);z-index:-1;
+  }
+  .intro-title .tail{font-family:var(--font);font-size:.64em;font-weight:700;letter-spacing:1px}
+  .intro-sub{
+    margin:18px 0 0;font-size:15px;line-height:1.8;font-weight:700;
+    color:var(--ink-2);letter-spacing:.4px;max-width:22em;
+  }
+  .hairline{height:3px;background:var(--ink);margin:24px 0 0;position:relative}
+  .hairline::after{content:'';position:absolute;left:0;top:0;width:56%;height:3px;background:var(--coral)}
+  .tags{
+    list-style:none;margin:0;padding:0;flex:1;display:flex;flex-direction:column;
+    justify-content:space-evenly;min-height:220px;
+  }
+  .tags li{
+    display:flex;align-items:center;gap:11px;
+    font-size:16px;line-height:1.55;font-weight:700;letter-spacing:.4px;
+    padding:13px 0;border-bottom:1px solid var(--line-soft);color:var(--ink);
+    transition:padding-left .18s ease,color .18s ease;
+  }
+  .tags li:first-child{border-top:1px solid var(--line-soft)}
+  .tags li:hover{padding-left:6px;color:var(--accent)}
+  .tags .mark{font-size:16px;flex:none;line-height:1}
+  .cta{
+    margin-top:22px;width:100%;height:58px;border:0;border-radius:2px;cursor:pointer;
+    background:var(--ink);color:#FBFAF4;
+    font-family:var(--display);font-size:21px;letter-spacing:4px;
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    box-shadow:6px 6px 0 rgba(228,85,58,.88);
+    transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+  }
+  .cta:hover{background:#000;transform:translate(2px,2px);box-shadow:4px 4px 0 rgba(228,85,58,.88)}
+  .cta:active{transform:translate(4px,4px);box-shadow:2px 2px 0 rgba(228,85,58,.88)}
+  .intro-foot{margin:16px 0 0;text-align:center;font-size:11px;letter-spacing:.4px;color:var(--muted)}
+
+  /* ===== 答题 ===== */
+  .q-top{display:flex;justify-content:space-between;align-items:baseline}
+  .q-top .qn{
+    font-family:var(--display);font-size:19px;letter-spacing:3px;color:var(--ink);
+  }
+  .q-top .qn span{color:var(--coral)}
+  .route{display:grid;grid-template-columns:repeat(32,1fr);gap:3px;margin:12px 0 0}
+  .route i{display:block;height:8px;background:var(--line-soft);border-radius:1px}
+  .route i.done{background:var(--ink)}
+  .route i.now{background:var(--coral)}
+  .q-body{flex:1;display:flex;flex-direction:column;padding-top:32px}
+  .q-text{
+    font-size:clamp(22px,6.2vw,26px);font-weight:900;line-height:1.5;letter-spacing:.4px;
+    margin:0 0 8px;min-height:3.1em;color:var(--ink);
+  }
+  .q-note{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--muted);margin:0 0 18px;text-transform:uppercase}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
+    font-family:var(--font);font-size:15px;font-weight:500;line-height:1.6;color:var(--ink);
+    background:#F7F7F1;border:1px solid var(--line);border-radius:2px;padding:16px 14px;
+    box-shadow:3px 3px 0 rgba(15,17,21,.05);
+    cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease,transform .15s ease,box-shadow .15s ease;
+  }
+  .opt:hover{background:#fff;border-color:var(--ink);transform:translate(-1px,-1px);box-shadow:4px 4px 0 rgba(27,55,196,.22)}
+  .opt:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(27,55,196,.22)}
+  .opt .bdg{
+    flex:none;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent);
+    border:1px solid var(--accent);border-radius:2px;width:22px;height:22px;
+    display:flex;align-items:center;justify-content:center;margin-top:2px;
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .opt .arw{
+    flex:none;margin-left:auto;align-self:center;font-size:14px;color:var(--muted);opacity:0;
+    transition:opacity .15s ease,transform .15s ease;
+  }
+  .opt:hover .arw{opacity:1;transform:translateX(2px)}
+  .opt.chosen{background:var(--accent);border-color:var(--accent);color:#FBFAF4;box-shadow:4px 4px 0 rgba(27,55,196,.35)}
+  .opt.chosen .bdg{background:#FBFAF4;color:var(--accent);border-color:#FBFAF4}
+  .opt.chosen .arw{opacity:1;color:#FBFAF4}
+  .q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .ghost{
+    border:0;background:none;font-family:var(--font);font-size:12px;color:var(--muted);
+    letter-spacing:1px;cursor:pointer;padding:6px 0;
+  }
+  .ghost:hover{color:var(--ink)}
+  .ghost[disabled]{opacity:.35;cursor:default}
+
+  /* ===== 结果 ===== */
+  .report-head{display:flex;justify-content:space-between;align-items:baseline;position:relative;padding-bottom:11px}
+  .report-head::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--ink)}
+  .report-head::before{
+    content:'';position:absolute;left:0;bottom:0;height:3px;width:34%;background:var(--coral);z-index:2;
+  }
+  .report-head .mono{color:var(--ink);font-weight:500}
+  .res-name{
+    font-family:var(--display);font-weight:400;
+    font-size:clamp(34px,9vw,42px);line-height:1.28;letter-spacing:3px;
+    margin:24px 0 0;color:var(--ink);position:relative;
+    text-shadow:4px 4px 0 rgba(228,85,58,.22);
+  }
+  .res-type{
+    display:flex;align-items:center;gap:8px;margin:14px 0 0;
+    font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--ink-2);
+  }
+  .res-type .sq{width:7px;height:7px;background:var(--accent);flex:none}
+  .chart-wrap{
+    margin-top:18px;position:relative;border:1px solid var(--line);border-radius:2px;
+    background:
+      radial-gradient(70% 70% at 50% 40%,rgba(27,55,196,.07) 0%,rgba(27,55,196,0) 70%),
+      #F8F8F2;
+    padding:6px 4px 2px;
+  }
+  .chart{width:100%;height:288px}
+  .chart-cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-align:center;margin:0 0 6px}
+  .intensity{margin-top:18px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:end}
+  .intensity .lbl{font-size:12px;font-weight:700;color:var(--ink-2);letter-spacing:.6px}
+  .intensity .val{font-family:var(--display);font-size:30px;line-height:.9;color:var(--coral);letter-spacing:1px}
+  .intensity .track{grid-column:1/-1;height:8px;background:var(--line-soft);border-radius:1px;overflow:hidden;margin-top:6px}
+  .intensity .fill{
+    height:100%;width:0;border-radius:1px;
+    background:linear-gradient(90deg,var(--accent),var(--coral));
+    transition:width .6s cubic-bezier(.2,.7,.3,1);
+  }
+  .sec{
+    font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--ink-2);
+    margin:28px 0 10px;display:flex;align-items:center;gap:9px;
+  }
+  .sec::before{content:'';width:7px;height:7px;background:var(--coral);flex:none;transform:rotate(45deg)}
+  .sec::after{content:'';flex:1;height:1px;background:var(--line)}
+  .dna{display:flex;flex-wrap:wrap;gap:8px}
+  .dna span{
+    font-size:12.5px;font-weight:700;letter-spacing:.6px;padding:7px 11px;
+    border:1px solid var(--ink);border-radius:2px;color:var(--ink);background:#fff;
+  }
+  .desc{font-size:14.5px;line-height:1.95;color:var(--ink-2);margin:0;text-align:justify}
+  .desc::first-letter{font-family:var(--display);font-size:2.1em;line-height:.9;color:var(--coral);float:left;padding:2px 6px 0 0}
+  .steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+  .steps li{display:flex;gap:12px;font-size:14px;line-height:1.8;color:var(--ink-2)}
+  .steps li .num{
+    font-family:var(--display);font-size:16px;color:var(--coral);flex:none;width:22px;
+  }
+  .pit{
+    margin-top:2px;padding:15px 16px;background:#F3F3EC;border:1px solid var(--line);border-left:4px solid var(--ink);
+    font-size:13px;line-height:1.85;color:var(--ink-2);
+  }
+  .pit b{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);margin-bottom:6px;font-weight:500}
+  .combo{
+    display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--ink);border-radius:2px;margin-top:2px;
+    background:linear-gradient(90deg,rgba(27,55,196,.07),rgba(228,85,58,.07));
+  }
+  .combo .v{font-family:var(--display);font-size:22px;letter-spacing:2px;color:var(--ink)}
+  .combo .sub{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.6}
+  .actions{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+  .btn-primary{
+    height:54px;border:0;border-radius:2px;background:var(--ink);color:#FBFAF4;
+    font-family:var(--display);font-size:18px;letter-spacing:3px;cursor:pointer;
+    box-shadow:5px 5px 0 rgba(228,85,58,.88);
+    transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+  }
+  .btn-primary:hover{background:#000;transform:translate(2px,2px);box-shadow:3px 3px 0 rgba(228,85,58,.88)}
+  .btn-line{
+    height:48px;border:1px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);
+    font-family:var(--font);font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;
+    transition:background .16s ease,color .16s ease;
+  }
+  .btn-line:hover{background:var(--ink);color:#FBFAF4}
+  .copy-tip{height:14px;margin:0;text-align:center;font-size:11px;color:var(--muted)}
+
+  /* ===== 图鉴 ===== */
+  .gal-head{display:flex;justify-content:space-between;align-items:baseline;position:relative;padding-bottom:11px}
+  .gal-head::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--ink)}
+  .gal-head::before{content:'';position:absolute;left:0;bottom:0;height:3px;width:34%;background:var(--coral);z-index:2}
+  .gal-head h2{margin:0;font-family:var(--display);font-size:26px;font-weight:400;letter-spacing:3px}
+  .gal-sub{font-size:12.5px;line-height:1.85;color:var(--ink-2);margin:14px 0 0;font-weight:500}
+  .gal-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+  .gal-card{
+    border:1px solid var(--line-soft);border-radius:2px;padding:14px 15px;background:#fff;
+    box-shadow:3px 3px 0 rgba(15,17,21,.05);
+  }
+  .gal-card h3{margin:0;font-family:var(--display);font-size:19px;font-weight:400;letter-spacing:2px}
+  .gal-card .gt{font-size:11px;font-family:var(--mono);letter-spacing:.08em;color:var(--accent);margin:6px 0 0}
+  .gal-card .gd{font-size:12.5px;line-height:1.7;color:var(--muted);margin:6px 0 0}
+  .gal-foot{margin-top:20px}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== 视图：首页 ===== -->
+  <section class="view active" id="view-intro">
+    <div class="hero-block" aria-hidden="true"></div>
+    <svg class="hero-deco" viewBox="0 0 200 200" aria-hidden="true">
+      <g fill="none" stroke="rgba(27,55,196,.55)" stroke-width="1">
+        <circle cx="100" cy="100" r="88"/><circle cx="100" cy="100" r="66"/>
+        <circle cx="100" cy="100" r="44"/><circle cx="100" cy="100" r="22"/>
+        <path d="M100 12V188M12 100H188M38 38L162 162M162 38L38 162"/>
+      </g>
+      <g fill="none" stroke="rgba(228,85,58,.55)" stroke-width="1.2">
+        <circle cx="106" cy="104" r="74"/>
+      </g>
+      <circle cx="100" cy="100" r="5" fill="rgba(27,55,196,.7)"/>
+    </svg>
+    <div class="intro">
+      <h1 class="intro-title"><span class="line-b">测一测，<br>你的<span class="hl">隐藏天赋</span><span class="tail">是什么</span></span></h1>
+      <p class="intro-sub">32 道直觉题，找出你天生就很顺的那件事</p>
+      <div class="hairline"></div>
+      <ul class="tags">
+        <li><span class="mark">✅</span><span>天赋类型 ｜ 10 种隐藏天赋</span></li>
+        <li><span class="mark">✅</span><span>直觉反应 ｜ 第一反应最准</span></li>
+        <li><span class="mark">✅</span><span>天赋浓度 ｜ 看看你的上限在哪</span></li>
+        <li><span class="mark">✅</span><span>使用说明 ｜ 告诉你该怎么用</span></li>
+      </ul>
+      <button class="cta" id="btn-start">点击测试 <span aria-hidden="true">→</span></button>
+      <p class="intro-foot">趣味测试仅供娱乐，找到你的本命天赋</p>
+    </div>
+  </section>
+
+  <!-- ===== 视图：答题 ===== -->
+  <section class="view" id="view-quiz">
+    <div class="q-top">
+      <span class="qn" id="q-count">Q.01 / 32</span>
+      <span class="mono" id="q-left">剩余 32</span>
+    </div>
+    <div class="route" id="route" aria-hidden="true"></div>
+    <div class="q-body">
+      <p class="q-text" id="q-text"></p>
+      <p class="q-note">都是你每天在做的事，凭第一反应选</p>
+      <div class="opts" id="opts"></div>
+      <div class="q-nav">
+        <button class="ghost" id="btn-back">← 上一题</button>
+        <span class="mono" id="q-progress">0 / 32</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：结果 ===== -->
+  <section class="view" id="view-result">
+    <div class="report-head">
+      <span class="mono">Talent Report</span>
+      <span class="mono">No. 032</span>
+    </div>
+    <h2 class="res-name" id="res-name"></h2>
+    <div class="res-type"><span class="sq"></span><span id="res-type"></span></div>
+
+    <div class="chart-wrap">
+      <div class="chart" id="radar"></div>
+      <p class="chart-cap">10-D TALENT MAP ｜ 十维天赋图谱</p>
+    </div>
+
+    <div class="intensity">
+      <span class="lbl">天赋浓度</span>
+      <span class="val" id="res-idx">--</span>
+      <span class="track"><span class="fill" id="res-fill"></span></span>
+    </div>
+
+    <p class="sec">叙 述 / PROFILE</p>
+    <div class="dna" id="res-dna"></div>
+
+    <p class="sec">为什么是你</p>
+    <p class="desc" id="res-desc"></p>
+
+    <p class="sec">把它用起来</p>
+    <ul class="steps" id="res-steps"></ul>
+
+    <p class="sec">小心这个坑</p>
+    <div class="pit"><b>WATCH OUT</b><span id="res-pit"></span></div>
+
+    <p class="sec">你的天赋组合</p>
+    <div class="combo" id="res-combo"></div>
+
+    <div class="actions">
+      <button class="btn-primary" id="btn-copy">复制我的结果</button>
+      <button class="btn-line" id="btn-again">重新测一次</button>
+      <button class="ghost" id="btn-gallery" style="text-align:center">看看 10 种天赋图鉴 →</button>
+      <p class="copy-tip" id="copy-tip"></p>
+    </div>
+  </section>
+
+  <!-- ===== 视图：天赋图鉴 ===== -->
+  <section class="view" id="view-gallery">
+    <div class="gal-head">
+      <h2>10 种天赋图鉴</h2>
+      <button class="ghost" id="btn-gal-back">← 返回结果</button>
+    </div>
+    <p class="gal-sub">没有高低，只有方向不同。找到那件「你做起来不费劲」的事，比硬撑更重要。</p>
+    <div class="gal-list" id="gal-list"></div>
+    <div class="gal-foot">
+      <button class="btn-line" id="btn-gal-again" style="width:100%">重新测一次</button>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script>
+/* ===== 天赋定义 ===== */
+const T = {
+  lang:{name:'人形社交路由器',type:'语言与表达型天赋',code:'LINGUISTIC',short:'表达',
+    tagline:'你一开口，场子就有温度',
+    dna:['会接话','共情快','表达有画面'],
+    desc:'你对「人」的信号特别敏感：谁在硬撑、谁在敷衍、谁还没被听见，你一眼就知道。你的本事不是话多，而是能把复杂的事说得让人愿意听。你在人群里不累，反而像在充电。',
+    steps:['把「说清楚」当主业：汇报、复盘、对外沟通优先接。','每周留一次公开表达：分享、讲课、写点东西，让别人看见你。','找一个需要大量对接的岗位或项目，你的价值会被放大。'],
+    pit:'话说得太顺，容易替别人把话说完，最后反而没人听见你想说的。'},
+  logic:{name:'人形 bug 探测器',type:'逻辑与分析型天赋',code:'ANALYTICAL',short:'逻辑',
+    tagline:'别人看故事，你看结构',
+    dna:['拆解力','找漏洞','冷静'],
+    desc:'你的大脑默认在找「哪里对不上」。数据、流程、一句话里的逻辑断层，你都能抓到。你不一定说得最多，但你说的时候，通常事情就被定下来了。',
+    steps:['主动接手复杂问题：流程梳理、数据核对、风险评估。','把结论写成一页纸，你的可信度来自清晰。','给自己设一个「先做后想」的小任务，别卡在分析里。'],
+    pit:'分析到 90 分才敢动，机会常常在 60 分的时候就被别人接走了。'},
+  create:{name:'脑内宇宙建造师',type:'创造与想象型天赋',code:'CREATIVE',short:'创造',
+    tagline:'你的脑子里常驻一个平行世界',
+    dna:['联想力','点子多','不怕怪'],
+    desc:'你总能从两件不相干的事之间连出一条线。别人说「这不行」，你已经在想「那换个方式呢」。你的价值不在于执行得多漂亮，而在于你总能让一件事变得不一样。',
+    steps:['每周固定一段「乱想时间」，点子先记下来，别急着判断。','找一个能把点子落地的人搭伙，你出方向他收尾。','用「小样」代替「大计划」：先做一版能看见的东西。'],
+    pit:'起头太容易、收尾太难，学会给自己设一条截止线。'},
+  hand:{name:'现场解决问题的人',type:'动手与执行型天赋',code:'PRACTICAL',short:'动手',
+    tagline:'你说「我来」，然后真的就弄好了',
+    dna:['手稳','上手快','务实'],
+    desc:'你不爱空谈。东西坏了你先拆开看看，事情卡了你先动手试。你身上有一种让人安心的确定性：交给你的事，会有结果。',
+    steps:['去接那些「必须有人干」的事，这是你最快出成绩的地方。','把过程记录成方法，让别人也能复制你的做法。','学会把成果说出来，别让它只留在现场。'],
+    pit:'一直埋头干活，容易被当成「顺手就该你干」，然后越干越多。'},
+  aesth:{name:'细节审美雷达',type:'审美与设计型天赋',code:'AESTHETIC',short:'审美',
+    tagline:'你说不出哪里不对，但你就是知道不对',
+    dna:['眼毒','版式感','质感控'],
+    desc:'你对比例、留白、颜色有本能的判断。同一份内容经你手过一遍，气质就不一样了。你的天赋是把「普通」悄悄调到「刚刚好」。',
+    steps:['任何要拿给人看的东西，最后都过你一遍。','把审美变成可复用的规则：配色、字号、间距，别只靠自己盯着。','做一份作品集，你的眼睛需要一个被看见的出口。'],
+    pit:'因为不够好看而反复返工，先定「交付标准」，再谈完美。'},
+  care:{name:'行走的情绪充电站',type:'共情与疗愈型天赋',code:'EMPATHIC',short:'共情',
+    tagline:'人在你旁边，会不自觉地松下来',
+    dna:['会听','情绪稳','让人放松'],
+    desc:'你能接住别人没说出口的部分。你给的不是建议，是「你可以这样」的空间。很多人回头想想，最难忘的是你当时没有打断他。',
+    steps:['需要信任的岗位最吃这套：客户、HR、教育、医护、社群。','给自己设边界：可以听，但不能替人扛。','把共情用在自己身上一次，先问一句「我今天怎么样」。'],
+    pit:'接太多别人的情绪，自己的没地方放，久了会慢慢耗空。'},
+  org:{name:'人形项目经理',type:'组织与统筹型天赋',code:'ORGANIZER',short:'统筹',
+    tagline:'事情再多，你脑子里有一张表',
+    dna:['有条理','推进力','会排期'],
+    desc:'你天生对「乱」过敏。人、时间、资源，你下意识就开始排。你不是喜欢管人，你是受不了事情一直悬着。有你在，大家心里有底。',
+    steps:['主动去当那个「拉群、定时间、追进度」的人，这是你的主场。','把流程沉淀成模板，你的效率会翻一倍。','学会授权：不是所有事都必须你亲自盯。'],
+    pit:'什么都自己扛，最后你自己成了整件事的瓶颈。'},
+  study:{name:'知识仓鼠',type:'学习与研究型天赋',code:'RESEARCHER',short:'钻研',
+    tagline:'你收藏的东西，比你以为的多得多',
+    dna:['好奇心','能钻','整理癖'],
+    desc:'你对「搞明白」有一种执念。别人查个大概就够，你要查到源头。你的优势是别人慌的时候，你手里有依据。',
+    steps:['挑一个窄而深的领域钻进去，你会很快成为那个「懂的人」。','把学到的写成笔记或清单，输出才是真的学会。','每月清一次收藏夹，把「以后读」变成「今天读」。'],
+    pit:'输入太多、输出太少，容易停在「什么都懂一点」。'},
+  body:{name:'肉体永动机',type:'身体与运动型天赋',code:'PHYSICAL',short:'体能',
+    tagline:'你的状态，是靠身体带起来的',
+    dna:['体力好','身体记忆','抗压'],
+    desc:'你不是靠想明白才有劲，你是动起来才想明白。你的身体比脑子先反应，而且往往是对的。累的时候你反而想出去跑一圈。',
+    steps:['把体力当资源管理：睡、动、吃，别硬扛。','需要长时间在场的事你最扛得住：现场、户外、连轴转的项目。','状态差的时候先动十分钟，情绪会跟着身体走。'],
+    pit:'觉得自己能扛就真的硬扛，小伤会一点点攒成大伤。'},
+  money:{name:'搞钱雷达',type:'商业与嗅觉型天赋',code:'COMMERCIAL',short:'商业',
+    tagline:'你总能先闻到「这里有生意」',
+    dna:['机会嗅觉','算得清','敢下手'],
+    desc:'你对价值流动很敏感：什么东西有人愿意付钱、哪里能省下、哪笔投入会回本。你谈钱不扭捏，因为你知道数字背后是自由。',
+    steps:['去接和「定价、谈判、资源置换」有关的事。','把你算账的方式写成模型，别只装在脑子里。','找一个懂执行的人合作，你的判断需要落地。'],
+    pit:'只盯收益，容易忽略「这件事值不值得做」。'}
+};
+
+/* ===== 32 题（4 选项 / 10 天赋，每种出现 12–13 次） ===== */
+const QUESTIONS = [
+ {q:'晚上八点决定点外卖，你的流程是',o:[
+   ['先发群里问一圈：谁吃过这家？怎么样','lang'],
+   ['三家平台比价，算满减，凑出最省的组合','logic'],
+   ['专挑名字奇怪、菜单离谱的新店','create'],
+   ['懒得比，手指一顿滑，哪家近点哪家','hand']]},
+ {q:'家里那盆绿植，你的照顾方式是',o:[
+   ['摆在最好看的位置，还得配个好看的盆','aesth'],
+   ['天天跟它说话，叶子一黄就心疼','care'],
+   ['定了浇水提醒，按表来，一周一次','org'],
+   ['查过它的习性，光照和水量都研究过了','study']]},
+ {q:'刷到「坚持运动 30 天」的挑战，你',o:[
+   ['当天就换上鞋出门，先跑一次再说','body'],
+   ['先算一下装备要花多少钱，值不值','money'],
+   ['发到群里，拉三个人一起打卡','lang'],
+   ['先研究这个计划科不科学，会不会伤膝盖','logic']]},
+ {q:'朋友说要来家里坐坐，你先',o:[
+   ['想个主题，把这次聚会弄成一个小项目','create'],
+   ['椅子摆好、水烧上，能坐下就行','hand'],
+   ['先把桌上、沙发上、墙上的东西重新摆一遍','aesth'],
+   ['先问他最近怎么样，是不是有事想说','care']]},
+ {q:'你的屏幕使用时间里，占比最高的是',o:[
+   ['待办、日程、备忘录','org'],
+   ['收藏夹里那些「以后要读」','study'],
+   ['运动记录和睡眠监测','body'],
+   ['购物车和比价页面','money']]},
+ {q:'约好的饭局临时取消，你',o:[
+   ['立刻在群里重新组一个局','lang'],
+   ['算了一下：省下的钱，和两个小时的自由','logic'],
+   ['把这个空出来的晚上做成一个奇怪的计划','create'],
+   ['二话不说，把已经点好的菜自己吃了','hand']]},
+ {q:'你的衣柜现在是什么状态',o:[
+   ['按颜色排成一排，看着就舒服','aesth'],
+   ['常穿的就那几件，其他都留着，有感情','care'],
+   ['换季收纳，箱子贴好标签','org'],
+   ['有几件买了没拆，想研究下是什么面料','study']]},
+ {q:'说好十一点睡，结果',o:[
+   ['十一点半去跑了个步，精神更好了','body'],
+   ['一边熬夜一边查副业，看看能不能多赚点','money'],
+   ['在群里跟人聊到两点','lang'],
+   ['玩到一半开始研究这个 App 的推荐算法','logic']]},
+ {q:'一个人做饭，你的上限是',o:[
+   ['冰箱里剩什么乱配一通，居然还挺好吃','create'],
+   ['煮面、煎蛋、热个饭，吃饱就行','hand'],
+   ['摆盘必须好看，哪怕只有一碗面','aesth'],
+   ['一不小心做多了，想着给室友也带一份','care']]},
+ {q:'计划一次短途旅行，你先做的是',o:[
+   ['把路线、时间、备选方案排成一张表','org'],
+   ['先把当地的资料和冷知识查一遍','study'],
+   ['查有没有能徒步、能下水的地方','body'],
+   ['比三家的价格，凑出最划算的组合','money']]},
+ {q:'你的社交电量，大概能撑多久',o:[
+   ['一整天，越聊越有电','lang'],
+   ['两小时，超过就开始看表算还剩多久','logic'],
+   ['看人，遇到有意思的能聊到天亮','create'],
+   ['不聊也行，有事直接干','hand']]},
+ {q:'家里乱到什么程度，你才会动手收拾',o:[
+   ['颜色一不搭我就难受，随时动手','aesth'],
+   ['有人要来，或者猫把东西踩脏了','care'],
+   ['每周固定一天，日历上早就有提醒','org'],
+   ['乱到找不到资料的时候','study']]},
+ {q:'办了健身卡之后',o:[
+   ['真去，一周三次，还挺享受','body'],
+   ['算了一下单次摊下来多少钱，有点心疼','money'],
+   ['拉了个搭子一起，主要靠聊天撑过去','lang'],
+   ['先把训练计划研究明白，理论先行','logic']]},
+ {q:'网购的东西和图片差太多，你会',o:[
+   ['动手改一改，说不定能变成别的东西','create'],
+   ['直接退，退货流程我闭着眼都会走','hand'],
+   ['先拍一组对比图，发出来给大家避雷','aesth'],
+   ['算了，卖家也不容易，留着吧','care']]},
+ {q:'你的存钱方式是',o:[
+   ['每月固定转一笔，自动扣，眼不见心不烦','org'],
+   ['看了一堆理财科普，先做功课','study'],
+   ['少点外卖、多走两步，省下的当健身','body'],
+   ['记账、比价、薅券，一分都不放过','money']]},
+ {q:'买了个要自己装的柜子',o:[
+   ['先找个人视频指导我','lang'],
+   ['先看图纸，把步骤在脑子里过一遍','logic'],
+   ['不看图纸，凭感觉装，多出来的零件放抽屉','create'],
+   ['螺丝刀一拿，二十分钟搞定','hand']]},
+ {q:'过年被亲戚问「最近在忙什么」',o:[
+   ['先看他的穿搭，心里默默打个分','aesth'],
+   ['先关心他身体，把话题带走','care'],
+   ['有条理地汇报：我最近在做三件事','org'],
+   ['认真讲了个他听不懂的专业细节','study']]},
+ {q:'逛超市时，你最容易在哪停下',o:[
+   ['运动饮料和零食区，先看热量','body'],
+   ['临期折扣区，能省一半','money'],
+   ['在生鲜区和阿姨聊起来，问哪块肉好','lang'],
+   ['在货架前比单价，算哪个规格划算','logic']]},
+ {q:'拆完的快递箱，你会',o:[
+   ['留着，说不定哪天能做点什么','create'],
+   ['拆平、捆好、扔到回收点','hand'],
+   ['把箱子上的标签撕干净再扔','aesth'],
+   ['问问楼下阿姨要不要，她收废品','care']]},
+ {q:'你相册里最多的是',o:[
+   ['截图：待办、行程、验证码','org'],
+   ['课件、书页、知识点','study'],
+   ['运动记录、体重、跑步轨迹','body'],
+   ['比价截图和优惠券','money']]},
+ {q:'线上开会时，你的状态是',o:[
+   ['开着麦，随时准备接话','lang'],
+   ['一边听一边记，找出逻辑不通的地方','logic'],
+   ['在纸上画一个完全无关的想法','create'],
+   ['静音，边听边把手上的活干完','hand']]},
+ {q:'刷短视频时，你最容易停在哪一类',o:[
+   ['好看的穿搭、家居、拍照','aesth'],
+   ['救助流浪猫狗、普通人的故事','care'],
+   ['收纳、效率、各种清单方法','org'],
+   ['冷知识、科普、把一件事拆开讲','study']]},
+ {q:'早上闹钟响了，你的第一个动作是',o:[
+   ['坐起来伸个懒腰，顺手做十个深蹲','body'],
+   ['眯眼看一眼余额，瞬间清醒','money'],
+   ['先回昨晚没回的消息','lang'],
+   ['躺着把今天的安排排一遍','logic']]},
+ {q:'朋友发来「救命，帮我看看这个」',o:[
+   ['给了个完全跳出框架的方案','create'],
+   ['直接把活接过来了','hand'],
+   ['先把他那份文档的排版改一遍','aesth'],
+   ['先问他是不是被谁为难了','care']]},
+ {q:'搬家这件事，你的准备度是',o:[
+   ['提前两周列清单，箱子编号','org'],
+   ['先查了十个搬家攻略','study'],
+   ['自己扛，一趟一趟搬完','body'],
+   ['算了三家的报价，选最便宜那家','money']]},
+ {q:'和室友因为「谁洗碗」吵起来',o:[
+   ['三句话把他绕进去，最后他道歉','lang'],
+   ['把这段时间谁做了什么，一条条列出来','logic'],
+   ['提议搞个轮值表，还加了奖惩','create'],
+   ['不吵了，我洗，下次我用另一套碗','hand']]},
+ {q:'看房时你最在意',o:[
+   ['采光和墙色，拍照好不好看','aesth'],
+   ['室友是什么人，好不好相处','care'],
+   ['通勤时间、合同细节、押几付几','org'],
+   ['周边配套、噪音、楼层，先查清楚','study']]},
+ {q:'半夜刷到「裸辞去大理」的视频，你',o:[
+   ['当场做了一组俯卧撑，觉得自己还能撑','body'],
+   ['算了下存款能撑几个月，心里有数了','money'],
+   ['转发到群里：我们什么时候走','lang'],
+   ['开始分析这事可行不可行、风险在哪','logic']]},
+ {q:'周末出门前的最后一秒，你在纠结',o:[
+   ['要不要去一个没去过的地方，随便走走','create'],
+   ['鞋一穿就走，没什么好纠结的','hand'],
+   ['穿哪件、配哪个包、今天的光线好不好','aesth'],
+   ['要不要叫上那个总一个人待着的朋友','care']]},
+ {q:'周日晚上，你在',o:[
+   ['把下周的日程排一遍，先有个底','org'],
+   ['赶在周末结束前，把最后几页看完','study'],
+   ['早点睡，明天还得早起','body'],
+   ['算算这个月还剩多少，能不能撑到发工资','money']]},
+ {q:'有人说「你挺有天赋的」，你会',o:[
+   ['立刻开始解释，越说越兴奋','lang'],
+   ['先问一句：你具体指哪方面','logic'],
+   ['猜他是不是在说我有点不正常','create'],
+   ['哦，谢谢，然后继续干活','hand']]},
+ {q:'这个周末，你打算',o:[
+   ['去一个好看的店，拍一组照片','aesth'],
+   ['去看个朋友，他最近状态不太好','care'],
+   ['把家里收拾一遍，把事办完','org'],
+   ['在家把攒着的书和课看完','study']]}
+];
+
+/* ===== 状态 ===== */
+const state = {answers:[], order:[]};
+const $ = id => document.getElementById(id);
+let locked = false, chart = null, radarValues = null, shareText = '';
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function showView(name){
+  ['intro','quiz','result','gallery'].forEach(v=>$('view-'+v).classList.toggle('active', v===name));
+  window.scrollTo(0,0);
+}
+function startQuiz(){
+  state.answers = [];
+  state.order = QUESTIONS.map(q => shuffle(q.o.map(([t,c])=>({t,c}))));
+  renderQuestion();
+  showView('quiz');
+}
+function renderRoute(){
+  const done = state.answers.length;
+  let html = '';
+  for(let i=0;i<32;i++){
+    const cls = i<done ? 'done' : (i===done && done<32 ? 'now' : '');
+    html += '<i class="'+cls+'"></i>';
+  }
+  $('route').innerHTML = html;
+  $('q-progress').textContent = done + ' / 32';
+}
+function renderQuestion(){
+  const idx = state.answers.length, total = QUESTIONS.length;
+  $('q-count').textContent = 'Q.' + String(idx+1).padStart(2,'0') + ' / 32';
+  $('q-left').textContent = '剩余 ' + (total-idx);
+  renderRoute();
+  $('q-text').textContent = QUESTIONS[idx].q;
+  const box = $('opts'); box.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  state.order[idx].forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'opt';
+    btn.innerHTML = '<span class="bdg">'+letters[i]+'</span><span>'+opt.t+'</span><span class="arw">→</span>';
+    btn.addEventListener('click', ()=>choose(btn, opt.c));
+    box.appendChild(btn);
+  });
+  $('btn-back').disabled = idx === 0;
+}
+function choose(el, key){
+  if(locked) return;
+  locked = true;
+  el.classList.add('chosen');
+  state.answers.push(key);
+  setTimeout(()=>{
+    locked = false;
+    if(state.answers.length >= QUESTIONS.length){ buildResult(); showView('result'); requestAnimationFrame(drawRadar); }
+    else renderQuestion();
+  }, 240);
+}
+function goBack(){
+  if(locked || !state.answers.length) return;
+  state.answers.pop(); renderQuestion();
+}
+
+function tally(){
+  const keys = Object.keys(T);
+  const s = {}; keys.forEach(k=>s[k]=0);
+  state.answers.forEach(k=>s[k]++);
+  const last = {}; state.answers.forEach((k,i)=>last[k]=i);
+  return keys.map(k=>({k, v:s[k], last:last[k]!==undefined?last[k]:-1}))
+    .sort((a,b)=> b.v-a.v || b.last-a.last);
+}
+
+function buildResult(){
+  const ranked = tally();
+  const top = ranked[0], second = ranked[1];
+  const t = T[top.k], s = T[second.k];
+  const maxQ = 13;
+  const pct = Math.min(100, Math.round(top.v / maxQ * 100));
+
+  $('res-name').textContent = t.name;
+  $('res-type').textContent = t.type + ' · ' + t.code;
+  $('res-idx').textContent = String(pct).padStart(2,'0');
+  $('res-dna').innerHTML = t.dna.map(d=>'<span>'+d+'</span>').join('');
+  $('res-desc').textContent = t.desc;
+  $('res-steps').innerHTML = t.steps.map((x,i)=>
+    '<li><span class="num">0'+(i+1)+'</span><span>'+x+'</span></li>').join('');
+  $('res-pit').textContent = t.pit;
+
+  $('res-combo').innerHTML = '<div><div class="v">'+t.short+' × '+s.short+'</div>'
+    + '<div class="sub">'+T[top.k].name+' + '+T[second.k].name+'，'+top.v+' 次 / '+second.v+' 次</div></div>';
+
+  radarValues = { labels: Object.keys(T).map(k=>T[k].short), values: Object.keys(T).map(k=>ranked.find(r=>r.k===k).v) };
+
+  requestAnimationFrame(()=>{ $('res-fill').style.width = pct + '%'; });
+
+  shareText = '我的隐藏天赋是【'+t.name+'】——'+t.type+'，天赋浓度 '+pct+'，'
+    + '和「'+s.short+'」组成 '+t.short+' × '+s.short+'。你也测测看？';
+  $('copy-tip').textContent = '';
+}
+
+function drawRadar(){
+  const el = $('radar');
+  if(!el) return;
+  if(typeof echarts === 'undefined'){
+    el.style.display = 'none';
+    if(!el.dataset.fb){
+      const fb = document.createElement('div');
+      fb.style.cssText = 'padding:8px 0';
+      fb.innerHTML = radarValues.labels.map((l,i)=>{
+        const max = Math.max(...radarValues.values, 1);
+        return '<div style="display:grid;grid-template-columns:52px 1fr 24px;gap:8px;align-items:center;margin-bottom:8px">'
+          + '<span style="font-size:11px;color:#767C89">'+l+'</span>'
+          + '<span style="height:6px;background:#E7E9EE;border-radius:1px;overflow:hidden"><span style="display:block;height:100%;width:'+Math.max(4,Math.round(radarValues.values[i]/max*100))+'%;background:#1D3FB3"></span></span>'
+          + '<span style="font-family:monospace;font-size:11px;color:#1D3FB3;text-align:right">'+radarValues.values[i]+'</span></div>';
+      }).join('');
+      el.parentNode.insertBefore(fb, el.nextSibling);
+      el.dataset.fb = '1';
+    }
+    return;
+  }
+  if(chart){ chart.dispose(); chart = null; }
+  chart = echarts.init(el, null, {renderer:'svg'});
+  chart.setOption({
+    animationDuration: 700,
+    radar: {
+      center: ['50%','52%'],
+      radius: '60%',
+      splitNumber: 4,
+      indicator: radarValues.labels.map(l=>({name:l, max:13})),
+      axisName: {color:'#4A4F5C', fontSize: 11},
+      splitLine: {lineStyle:{color:'#E0E4EE'}},
+      splitArea: {areaStyle:{color:['rgba(29,63,179,0.02)','rgba(29,63,179,0.05)']}},
+      axisLine: {lineStyle:{color:'#E0E4EE'}}
+    },
+    series: [{
+      type: 'radar',
+      symbol: 'circle',
+      symbolSize: 4,
+      lineStyle: {color:'#1D3FB3', width: 1.6},
+      itemStyle: {color:'#1D3FB3'},
+      areaStyle: {color:'rgba(29,63,179,0.13)'},
+      data: [{value: radarValues.values, name:'天赋'}]
+    }]
+  });
+}
+
+function copyResult(){
+  if(!shareText) return;
+  const done = ()=>{ $('copy-tip').textContent = '已复制，可以直接发小红书'; };
+  const fallback = ()=>{
+    const ta = document.createElement('textarea');
+    ta.value = shareText; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){ $('copy-tip').textContent = '复制失败，请长按选择文字'; }
+    document.body.removeChild(ta);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(shareText).then(done).catch(fallback);
+  } else fallback();
+}
+
+function renderGallery(){
+  $('gal-list').innerHTML = Object.keys(T).map(k=>{
+    const t = T[k];
+    return '<div class="gal-card"><h3>'+t.name+'</h3>'
+      + '<p class="gt">'+t.type+'</p>'
+      + '<p class="gd">'+t.tagline+'</p></div>';
+  }).join('');
+  showView('gallery');
+}
+
+$('btn-start').addEventListener('click', startQuiz);
+$('btn-back').addEventListener('click', goBack);
+$('btn-copy').addEventListener('click', copyResult);
+$('btn-again').addEventListener('click', startQuiz);
+$('btn-gallery').addEventListener('click', renderGallery);
+$('btn-gal-back').addEventListener('click', ()=>showView('result'));
+$('btn-gal-again').addEventListener('click', startQuiz);
+window.addEventListener('resize', ()=>{ if(chart) chart.resize(); });
+
+document.addEventListener('keydown', e=>{
+  if(!$('view-quiz').classList.contains('active')) return;
+  const i = ['1','2','3','4'].indexOf(e.key);
+  if(i>-1){ const b = $('opts').querySelectorAll('.opt'); if(b[i]) b[i].click(); }
+  if(e.key === 'Backspace'){ e.preventDefault(); goBack(); }
+});
+</script>
+</body>
+</html>
+<!-- （注：内容由AI生成） -->
